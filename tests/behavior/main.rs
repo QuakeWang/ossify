@@ -20,6 +20,7 @@ fn main() -> Result<()> {
 
     operations::list::tests(&client, &mut tests);
     operations::delete::tests(&client, &mut tests);
+    operations::upload::tests(&client, &mut tests);
 
     let _ = tracing_subscriber::fmt()
         .pretty()
@@ -28,8 +29,6 @@ fn main() -> Result<()> {
         .try_init();
 
     let conclusion = libtest_mimic::run(&args, tests);
-
-    TEST_RUNTIME.block_on(TEST_FIXTURE.cleanup(client.operator()));
 
     conclusion.exit()
 }
