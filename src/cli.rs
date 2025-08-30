@@ -46,6 +46,8 @@ pub enum Commands {
     Mkdir(MkdirArgs),
     /// Display object metadata
     Stat(StatArgs),
+    /// Display file contents
+    Cat(CatArgs),
 }
 
 #[derive(Parser, Debug)]
@@ -138,6 +140,13 @@ pub struct MkdirArgs {
 }
 
 #[derive(Parser, Debug)]
+pub struct CatArgs {
+    /// The remote file path to display
+    #[arg(value_name = "FILE", value_parser = parse_validated_path)]
+    pub file: String,
+}
+
+#[derive(Parser, Debug)]
 pub struct StatArgs {
     /// The path to stat
     #[arg(value_name = "PATH", value_parser = parse_validated_path)]
@@ -190,6 +199,9 @@ pub async fn run(args: Args, client: StorageClient) -> Result<()> {
             client
                 .create_directory(&mkdir_args.path, mkdir_args.parents)
                 .await?;
+        }
+        Commands::Cat(cat_args) => {
+            client.cat_file(&cat_args.file).await?;
         }
         Commands::Stat(stat_args) => {
             let format = if stat_args.json {
